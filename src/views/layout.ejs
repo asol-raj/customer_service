@@ -20,10 +20,11 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav">
-          <li class="nav-item"><a class="nav-link" href="/auth/dashboard">Dashboard</a></li>
-        </ul>
         <? if (!hideNavbar) { ?>
+        <ul class="navbar-nav">
+          <li class="nav-item"><a class="nav-link" href="/<?= user?.user_type=='staff'?'staff':'auth'?>/dashboard">Dashboard</a></li>
+        </ul>
+        
         <div class="usersbadge fw-semibold ms-auto me-4">
           Welcome
           <?= user?.username || user?.email ?>       

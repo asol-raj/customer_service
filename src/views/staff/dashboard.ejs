@@ -1,0 +1,63 @@
+<div class="container">
+
+
+    <div class="row my-5 text-center g-4">
+        <!-- Total Users -->
+        <div class="col-6 col-md-3">
+            <div class="p-4 border rounded shadow-sm h-100" role="button">
+                <div class="mb-2">
+                    <i class="bi bi-people fs-2 text-primary"></i>
+                </div>
+                <h6 class="text-muted mb-1">Total Users</h6>
+                <h4 class="fw-bold mb-0" id="totalUsers">0</h4>
+            </div>
+        </div>
+
+        <!-- New Users -->
+        <div class="col-6 col-md-3">
+            <div class="p-4 border rounded shadow-sm h-100" role="button">
+                <div class="mb-2">
+                    <i class="bi bi-person-plus fs-2 text-success"></i>
+                </div>
+                <h6 class="text-muted mb-1">New Users</h6>
+                <h4 class="fw-bold mb-0 text-success" id="newUsers">0</h4>
+            </div>
+        </div>
+
+        <!-- Total Tickets -->
+        <div class="col-6 col-md-3">
+            <div class="p-4 border rounded shadow-sm h-100" role="button">
+                <div class="mb-2">
+                    <i class="bi bi-ticket-perforated fs-2 text-warning"></i>
+                </div>
+                <h6 class="text-muted mb-1">Total Tickets</h6>
+                <h4 class="fw-bold mb-0" id="totalTickets">0</h4>
+            </div>
+        </div>
+
+        <!-- New Tickets (Outstanding Card) -->
+        <div class="col-6 col-md-3">
+            <div class="p-4 rounded shadow-lg bg-primary text-white h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="mb-2">
+                        <i class="bi bi-ticket-detailed fs-2"></i>
+                    </div>
+                    <h6 class="mb-1">New Tickets</h6>
+                    <h4 class="fw-bold mb-3" id="newTickets">0</h4>
+                </div>
+                <a href="/staff/tickets/new" class="btn btn-light btn-sm fw-semibold" role="button">
+                    View Tickets
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <div class="dataTable table-responsive"></div>
+        </div>
+    </div>
+
+</div>
+
+<script type="module" src="/js/staff/dashboard.js"></script>

@@ -8,6 +8,7 @@ const port = process.env.PORT || 6200;
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const ejs = require('ejs');
+const log = console.log;
 ejs.delimiter = '?';
 
 
@@ -54,7 +55,7 @@ app.listen(port, '0.0.0.0', () => {
     let hostAddress;
 
     for (const name in networkInterfaces) {
-        const interfaces = networkInterfaces[name];
+        const interfaces = networkInterfaces[name]; //console.log(interfaces)
         for (const iface of interfaces) {
             if (iface.family === 'IPv4' && !iface.internal) {
                 hostAddress = iface.address;

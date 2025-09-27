@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const AuthController = require('../controllers/authController');
 const verifyToken = require('../middleware/auth');
+const AuthController = require('../controllers/authController');
 
 router.use('/auth', verifyToken, require('./auth'));
+router.use('/staff', verifyToken, require('./staff'));
 // router.use('/auth/ticket', require('./ticketRoute'));
 
 router.get('/', (req, res)=> res.render('index'));

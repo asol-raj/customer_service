@@ -4,33 +4,12 @@ const Messages = require('../models/messages');
 const Attachments = require('../models/attachments');
 const pool = require('../config/db');
 const path = require('path');
+const log = console.log;
 const fs = require('fs');
-
-// Configure multer storage
-const multer = require('multer');
 const Tickets = require('../models/tickets');
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const uploadPath = path.join(__dirname, '../../uploads');
-    if (!fs.existsSync(uploadPath)) {
-      fs.mkdirSync(uploadPath, { recursive: true });
-    }
-    cb(null, uploadPath);
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname);
-    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
-  }
-});
 
-const upload = multer({ storage });
 
 const TicketController = {
-
-  // Middleware to handle multiple attachments
-  // uploadFiles: upload.array('attachments', 5), // max 5 files
-
   dashboard: async (req, res) => {
     try {
       // For customers, get their tickets
@@ -41,20 +20,24 @@ const TicketController = {
           [req.user.id]
         );
         tickets = rows;
+        return res.render('users/dashboard', { user: req.user, tickets });
       }
 
+      // For Staff
       if (req.user.user_type === 'staff') {
         // Staff might see all tickets, or assigned ones
+        const [users] = await pool.query(`select count(*) from users where user_type = 'customer'`); log(users);
         const [rows] = await pool.query(
           'SELECT id, subject, status, created_at FROM tickets ORDER BY created_at DESC'
         );
         tickets = rows;
+        return res.render('staff/dashboard', { user: req.user, tickets });
       }
 
-      res.render('users/dashboard', { user: req.user, tickets });
+      // res.render('users/dashboard', { user: req.user, tickets });
     } catch (err) {
       console.error(err);
-      res.render('users/dashboard', { user: req.user, tickets: [] });
+      res.render('index', { user: req.user, tickets: [] });
     }
   },
 
@@ -90,9 +73,8 @@ const TicketController = {
       if (req.files && req.files.length > 0) {
         for (const file of req.files) {
           const fileType = file.mimetype.startsWith('image/') ? 'image' :
-            file.mimetype === 'application/pdf' ? 'pdf' : 'other';
-
-          await Attachments.create(messageId, file.originalname, `/uploads/${file.filename}`, fileType);
+            file.mimetype === 'application/pdf' ? 'pdf' : 'other'; // log(file);
+          await Attachments.create(messageId, file.filename, file.path, fileType);
         }
       }
 
@@ -127,7 +109,7 @@ const TicketController = {
 
       // 3) load messages (follow-ups) with author info
       const [messages] = await pool.query(
-        `SELECT 
+      `SELECT 
           m.id,
           m.message_text,
           m.created_at,
@@ -223,19 +205,29 @@ const TicketController = {
       const messageId = result.insertId;
 
       // 4) insert attachments if any
-      if (files && files.length > 0) {
-        const attachmentsData = files.map(f => [
-          messageId,
-          f.originalname,
-          f.path,
-          f.mimetype.startsWith('image/') ? 'image' :
-            f.mimetype === 'application/pdf' ? 'pdf' : 'other'
-        ]);
+      // if (files && files.length > 0) {
+      //   const attachmentsData = files.map(f => [
+      //     messageId,
+      //     f.filename,
+      //     f.path,
+      //     f.mimetype.startsWith('image/') ? 'image' :
+      //       f.mimetype === 'application/pdf' ? 'pdf' : 'other'
+      //   ]);
 
-        await pool.query(
-          'INSERT INTO attachments (message_id, file_name, file_path, file_type) VALUES ?',
-          [attachmentsData]
-        );
+      //   await Attachments.create(messageId, f.filename, `/uploads/${f.filename}`, fileType);
+      //   await pool.query(
+      //     'INSERT INTO attachments (message_id, file_name, file_path, file_type) VALUES ?',
+      //     [attachmentsData]
+      //   );
+      // }
+
+      if (req.files && req.files.length > 0) {
+        for (const file of req.files) {
+          const fileType = file.mimetype.startsWith('image/') ? 'image' :
+            file.mimetype === 'application/pdf' ? 'pdf' : 'other';
+          // await Attachments.create(messageId, file.filename, `/uploads/${file.filename}`, fileType);
+          await Attachments.create(messageId, file.filename, file.path, fileType);
+        }
       }
 
       // 5) redirect back to the same ticket page

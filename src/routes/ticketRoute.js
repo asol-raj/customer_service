@@ -47,27 +47,8 @@ router.post('/create', upload.array('attachments', MAX_FILES), TicketController.
 // POST follow-up
 router.post('/:id/reply', upload.array('attachments', MAX_FILES), TicketController.addFollowUp);
 
-// app.js or routes/ticket.js
-// router.get('/attachments/:filename', verifyToken, async (req, res) => {
-//   const { filename } = req.params;
-//   const user = req.user;
+// staff routes
 
-//   // 1) Lookup file in DB
-//   const [rows] = await pool.query('SELECT a.*, m.ticket_id, t.user_id AS ticket_owner FROM attachments a JOIN messages m ON a.message_id = m.id JOIN tickets t ON m.ticket_id = t.id WHERE a.file_name = ?', [filename]);
-//   if (rows.length === 0) {
-//     return res.status(404).send('File not found');
-//   }
-//   const file = rows[0];
-
-//   // 2) Check access control
-//   if (user.user_type === 'customer' && file.ticket_owner !== user.id) {
-//     return res.status(403).send('Access denied');
-//   }
-
-//   // 3) Send the file
-//   const filePath = path.join(__dirname, '../uploads', file.file_name);
-//   res.sendFile(filePath);
-// });
 
 router.get('/attachments/:ticketId/:filename', verifyToken, async (req, res) => {
   try {

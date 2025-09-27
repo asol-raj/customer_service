@@ -7,6 +7,22 @@ export const axios = window.axios;
 import Fields from './formfields.js';
 
 /**
+ * Formats a number into the US number format (e.g., 12345 -> "12,345").
+ * @param {number | string} num The number to format.
+ * @returns {string} The formatted number string, or '0' for invalid input.
+ */
+export function formatNumberUS(num) {
+    // Convert input to a number and check if it's valid.
+    const number = Number(num);
+    if (isNaN(number)) {
+        return '0';
+    }
+
+    // Use the built-in Internationalization API for robust, locale-aware formatting.
+    return new Intl.NumberFormat('en-US').format(number);
+}
+
+/**
  * Helper to fetch data using GET request.
  * @param {string} url - The endpoint URL.
  * @param {object|null} params - Optional query parameters.
@@ -43,6 +59,50 @@ export async function postData(url, body = {}, config = null) {
         // log(error);
         // console.log("Error posting data:", error.message);
         throw error;
+    }
+}
+
+/**
+ * Send an "advance query" request to the server.
+ *
+ * @param {string} url - Endpoint URL
+ * @param {object} payload - { fn, key, qry, values }
+ * @param {object} [config] - Optional axios config (headers, timeout, signal, etc.)
+ * @returns {Promise<any>} response.data
+ */
+export async function advanceQuery({ fn = null, key = null, qry = null, values = [] } = {}, config = {}) {
+    const url = '/auth/advance-query';
+    // At least one source should be provided (fn | key | qry)
+    if (!fn && !key && !qry) {
+        throw new Error('Please provide one of: fn, key, or qry');
+    }
+
+    // Ensure values is an array (server expects an array)
+    const safeValues = Array.isArray(values) ? values : [values];
+
+    // Default axios config: JSON and short timeout (override by passing config)
+    const defaultConfig = {
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        timeout: 30000, // 30s default, override via config
+        ...config
+    };
+
+    try {
+        const resp = await axios.post(url, { fn, key, qry, values: safeValues }, defaultConfig);
+        return resp.data;
+    } catch (err) {
+        // Normalize error to be easier to handle by caller
+        // If server responded (status >= 400) expose server payload first
+        if (err && err.response) {
+            const { status, data } = err.response;
+            const message = (data && data.message) || (data && data.error) || data || `Request failed with status ${status}`;
+            const error = new Error(String(message));
+            error.status = status;
+            error.data = data;
+            throw error;
+        }
+        // Timeout / network / cancellation / other error
+        throw err;
     }
 }
 
@@ -400,4 +460,147 @@ export function createFlyoutMenu(triggerElement, items, handlerMap = {}, rowData
         }
     };
     setTimeout(() => document.addEventListener("click", handleClickOutside), 0);
+}
+
+/**
+ * Creates an HTML table from an array of data.
+ *
+ * @param {Array<Object>} data - The array of objects to populate the table. Each object's keys will be used as table headers, and its values as cell data.
+ * @param {boolean} [includeSerial=true] - Whether to include a serial number column (#) at the beginning of each row. Defaults to true.
+ * @param {boolean} [fixTableHead=true] - Whether to apply a "tbl-fixedhead" class to the table header for potential fixed positioning. Defaults to true.
+ * @returns {{table: HTMLTableElement, thead: HTMLTableSectionElement, tbody: HTMLTableSectionElement, data: Array<Object>, tbl: {table: HTMLTableElement, thead: HTMLTableSectionElement, tbody: HTMLTableSectionElement}}|boolean} An object containing references to the created table elements and the original data, or `false` if the input data is invalid.
+ */
+export function createTableNew({
+    data,
+    includeSerial = false,
+    fixTableHead = true,
+    size = "small",
+    colsToTotal = [],
+    caption = null
+}) {
+    // If no data or empty data is provided, return false.
+    if (!data || data.length === 0) {
+        console.warn("createTable: No data or empty data provided.");
+        return false;
+    }
+
+    // Create table elements
+    const table = document.createElement("table");
+    const thead = document.createElement("thead");
+    const tbody = document.createElement("tbody");
+
+    // --- Create Table Header (thead) ---
+    const headerRow = document.createElement("tr");
+
+    // Add serial number column header if requested
+    if (includeSerial) {
+        const serialHeader = document.createElement("th");
+        serialHeader.textContent = "#";
+        serialHeader.className = "css-serial";
+        headerRow.append(serialHeader);
+    }
+
+    // Create headers from the keys of the first data object
+    for (const key in data[0]) {
+        const th = document.createElement("th");
+        th.innerHTML = key; // Use innerHTML as original code did, but textContent is generally safer for plain text
+        th.className = "";
+        th.dataset.key = key; // Store the original key in a data attribute
+        headerRow.append(th);
+    }
+
+    if (caption) {
+        let x = document.createElement('caption');
+        jq(x).text(caption).addClass('fw-bold tbl-caption')
+        table.appendChild(x);
+    }
+
+    thead.append(headerRow);
+    table.append(thead);
+
+    // --- Create Table Body (tbody) ---
+    data.forEach((rowData, index) => {
+        const bodyRow = document.createElement("tr");
+
+        // Add serial number cell if requested
+        if (includeSerial) {
+            const serialCell = document.createElement("td");
+            serialCell.textContent = index + 1; // Serial numbers typically start from 1
+            serialCell.className = "css-serial";
+            bodyRow.append(serialCell);
+        }
+
+        // Populate cells with data from the current row object
+        for (const key in rowData) {
+            const td = document.createElement("td");
+            td.innerHTML = rowData[key]; // Use innerHTML as original code did
+            td.dataset.key = key; // Store the original key in a data attribute
+            td.dataset.value = rowData[key];
+            bodyRow.append(td);
+        }
+        tbody.append(bodyRow);
+    });
+
+    table.append(tbody);
+
+    // --- Apply Classes and Return ---
+    // Apply base table classes using a hypothetical `jq` (jQuery-like) function.
+    // If jQuery is not available, you would use standard DOM manipulation.
+    if (typeof jq !== "undefined") {
+        jq(table).addClass("table css-serial table-hover tbl-custom mb-2 caption-top");
+        if (size) jq(table).addClass('table-sm');
+        // Remove 'css-serial' if serial numbers are not included
+        if (!includeSerial) {
+            jq(table).removeClass("css-serial");
+        }
+
+        // Apply fixed head class if requested
+        if (fixTableHead) {
+            jq(thead).addClass("tbl-fixed");
+        }
+    } else {
+        // Fallback for non-jQuery environments
+        table.classList.add("table", "table-hover", "tbl-custom");
+        if (size) table.classList.add("table-sm");
+        if (includeSerial) {
+            table.classList.add("css-serial");
+        } else {
+            table.classList.remove("css-serial");
+        }
+        if (fixTableHead) {
+            thead.classList.add("tbl-fixed");
+        }
+    }
+
+    let tfoot = null;
+    if (colsToTotal.length) {
+        tfoot = document.createElement('tfoot');
+        const tr = document.createElement('tr');
+        for (const key in data[0]) {
+            let td = document.createElement('td');
+            td.dataset.key = key;
+            td.dataset.value = '';
+            tr.append(td);
+        }
+        tfoot.append(tr);
+        table.append(tfoot);
+
+        colsToTotal.forEach(col => {
+            const total = data.reduce((sum, item) => {
+                const value = parseNumber(item[col]);
+                return sum + value;
+            }, 0);
+
+            const $cell = jq(tfoot).find(`[data-key="${col}"]`);
+            $cell[0].dataset.value = total;
+            $cell.addClass('fw-bold text-end').text(parseCurrency(total));
+            jq(table).find(`[data-key="${col}"]`).addClass('text-end');
+            jq(tbody).find(`[data-key="${col}"]`).each(function (i, e) {
+                jq(this).text(parseLocals(this.textContent))
+            })
+        });
+    }
+
+    // Return an object containing references to the created elements
+    return { table, tbody, thead, tfoot, data };
 }

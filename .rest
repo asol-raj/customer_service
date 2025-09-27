@@ -1,0 +1,8 @@
+POST http://localhost:6200/register
+Content-Type: application/json
+
+{
+  "username": "rshekhar21@123cfc.com",
+  "password": "269608Raj$",
+  "user_type": "staff"
+}

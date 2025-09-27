@@ -1,4 +1,4 @@
--- Active: 1758704013034@@127.0.0.1@3306@customer_service
+-- Active: 1758133010005@@localhost@3306@customer_service
 -- CREATE DATABASE IF NOT EXISTS `customer_service`;
 -- CREATE USER IF NOT EXISTS 'user_cs'@'%' IDENTIFIED BY '269608Raj$';
 -- GRANT ALL PRIVILEGES ON `customer_service`.* TO 'user_cs'@'%' WITH GRANT OPTION;

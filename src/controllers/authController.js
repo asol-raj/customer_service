@@ -2,14 +2,15 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const { jwtSecret, jwtExpiry } = require('../config/auth');
+const log = console.log;
 
 const saltRounds = 10;
 
 const AuthController = {
   // Register customer
   register: async (req, res) => {
-    try {
-      const { username, password } = req.body;
+    try { 
+      const { username, password, user_type='customer' } = req.body;
 
       const existingUser = await User.findByUsername(username);
       if (existingUser) {
@@ -17,7 +18,7 @@ const AuthController = {
       }
 
       const hashedPassword = await bcrypt.hash(password, saltRounds);
-      const userId = await User.create(username, hashedPassword, 'customer');
+      const userId = await User.create(username, hashedPassword, user_type);
 
       return res.status(201).render('index', { message: 'Registration successful', userId });
     } catch (err) {
@@ -30,9 +31,9 @@ const AuthController = {
   // Login (customer or staff)
   login: async (req, res) => {
     try {
-      const { username, password } = req.body; console.log(username, password);
+      const { username, password } = req.body; //console.log(username, password);
 
-      const user = await User.findByUsername(username);
+      const user = await User.findByUsername(username); console.log('user', user)
       if (!user) return res.status(401).render('index', { error: 'Invalid credentials' });
 
       const passwordMatch = await bcrypt.compare(password, user.password_hash);
@@ -50,16 +51,16 @@ const AuthController = {
         maxAge: 1000 * 60 * 60 * 8 // 8 hours
       });
 
-      return res.redirect('/auth/dashboard');
-      // // Redirect based on user_type
-      // if (user.user_type === 'customer') {
-      //   res.redirect('/auth/dashboard'); // customer ticket page
-      //   // res.redirect('/', { message: 'testok'}); // customer ticket page
-      // } else if (user.user_type === 'staff') {
-      //   res.redirect('/auth/dashboard'); // staff dashboard
-      // } else {
-      //   res.redirect('/'); // fallback
-      // }
+      // return res.redirect('/auth/dashboard');
+      // Redirect based on user_type
+      if (user.user_type === 'customer') {
+        res.redirect('/auth/dashboard'); // customer ticket page
+        // res.redirect('/', { message: 'testok'}); // customer ticket page
+      } else if (user.user_type === 'staff') {
+        res.redirect('/staff/dashboard'); // staff dashboard
+      } else {
+        res.redirect('/'); // fallback
+      }
 
     } catch (err) {
       console.error(err);

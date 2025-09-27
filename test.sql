@@ -1,5 +1,20 @@
--- Active: 1758704013034@@127.0.0.1@3306@customer_service
+-- Active: 1758133010005@@localhost@3306@customer_service
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+SELECT * FROM users;
+SELECT id, username, date_format(created_at, '%m-%d-%Y, %r') created_at FROM users WHERE user_type = 'customer' ORDER BY id DESC
 
 SELECT * FROM tickets;
 SELECT * FROM messages WHERE ticket_id = 3;
