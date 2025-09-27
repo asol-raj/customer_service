@@ -1,0 +1,49 @@
+
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>My Tickets</h2>
+    <a href="/auth/ticket/new" class="btn btn-primary">
+      <i class="bi bi-plus-circle"></i> Create Ticket
+    </a>
+  </div>
+
+  <? if (tickets && tickets.length > 0) { ?>
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Subject</th>
+            <th>Status</th>
+            <th>Created At</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <? tickets.forEach(ticket => { ?>
+            <tr>
+              <td><?= ticket.id ?></td>
+              <td><?= ticket.subject ?></td>
+              <td>
+                <span class="badge 
+                  <?= ticket.status === 'open' ? 'bg-success' : 
+                      ticket.status === 'in_progress' ? 'bg-warning text-dark' : 'bg-secondary' ?>">
+                  <?= ticket.status ?>
+                </span>
+              </td>
+              <td><?= new Date(ticket.created_at).toLocaleString() ?></td>
+              <td>
+                <a href="/auth/ticket/<?= ticket.id ?>" class="btn btn-sm btn-outline-primary">
+                  View
+                </a>
+              </td>
+            </tr>
+          <? }) ?>
+        </tbody>
+      </table>
+    </div>
+  <? } else { ?>
+    <div class="alert alert-info">No tickets found. Create your first ticket!</div>
+  <? } ?>
+</div>
+

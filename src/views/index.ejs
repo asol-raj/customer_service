@@ -1,0 +1,61 @@
+<div class="container-md pt-5">
+    <h3>Customer Services</h3>
+
+    <div class="row mt-5">
+        <div class="col-auto col-md-8 col-lg-5">
+            <?=error ?>
+            <div class="alert alert-danger <?= error ?'':'d-none' ?>" role="alert">
+                <?= error ?>
+            </div>
+            <div class="alert alert-info <?= message ?'':'d-none' ?>" role="alert">
+                <?= message ?>
+            </div>
+            <form action="/login" method="post" id="loginForm">
+                <h4 class="mb-3">Login</h4>
+                <div class="mb-3">
+                    <label for="usernmae" class="form-label">Username</label>
+                    <input class="form-control form-control-lg" type="text" name="username" id="usernmae" required>
+                    <div class="form-text">Your username (email/contact number) is for internal communication only.
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input class="form-control form-control-lg" type="password" name="password" id="password" required>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <button class="btn btn-link register">Dont have an account?</button>
+                    <button class="btn btn-outline-primary btn-lg">Login</button>
+                </div>
+            </form>
+
+            <form action="/register" method="post" id="registerFrom" class="d-none">
+                <h4 class="mb-3">Register</h4>
+                <div class="mb-3">
+                    <label for="userName" class="form-label">Username</label>
+                    <input class="form-control form-control-lg" type="text" name="username" id="userName" required>
+                    <div class="form-text">Username can be Email, Conctact or any 3 Letters Word</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="passWord" class="form-label">Password</label>
+                    <input class="form-control form-control-lg" type="password" name="password" id="passWord" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="passWord" class="form-label">Confirm Password</label>
+                    <input class="form-control form-control-lg" type="password" name="confpassword" id="cnfPassword"
+                        required>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <button class="btn btn-link login">Already Registered?</button>
+                    <button class="btn btn-outline-primary btn-lg">Register</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="/js/index.js"></script>

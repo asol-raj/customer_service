@@ -1,0 +1,102 @@
+<div class="container mt-5">
+  <!-- Ticket Header -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <h4>
+        <?= ticket.subject ?>
+      </h4>
+      <p class="text-muted">Created:
+        <?= new Date(ticket.created_at).toLocaleString() ?>
+      </p>
+      <? if (ticket.description) { ?>
+      <p>
+        <?= ticket.description ?>
+      </p>
+      <? } ?>
+      <? if (ticket.invoice_number) { ?>
+      <p><strong>Invoice #:</strong>
+        <?= ticket.invoice_number ?>
+      </p>
+      <? } ?>
+      <? if (ticket.policy_number) { ?>
+      <p><strong>Policy #:</strong>
+        <?= ticket.policy_number ?>
+      </p>
+      <? } ?>
+      <p><strong>Status:</strong>
+        <span class="badge 
+          <?= ticket.status === 'open' ? 'bg-success' : 
+              ticket.status === 'in_progress' ? 'bg-warning text-dark' : 
+              ticket.status === 'resolved' ? 'bg-primary' : 'bg-secondary' ?>">
+          <?= ticket.status ?>
+        </span>
+      </p>
+    </div>
+  </div>
+
+  <!-- Messages / Follow-ups -->
+  <div class="d-flex flex-column gap-3">
+    <? if (messages && messages.length > 0) { ?>
+    <? messages.forEach(msg => { ?>
+    <div class="card p-3">
+      <div class="d-flex justify-content-between">
+        <!-- Message Text -->
+        <div class="flex-grow-1 me-3">
+          <p class="mb-1">
+            <?= msg.message_text ?>
+          </p>
+          <small class="text-muted">By
+            <?= msg.author_name ?> (
+            <?= msg.author_type ?>) at
+            <?= new Date(msg.created_at).toLocaleString() ?>
+          </small>
+        </div>
+
+        <!-- Attachments -->
+        <div class="d-flex justify-content-end align-items-center gap-2">
+        <? if (msg.attachments && msg.attachments.length > 0) { ?>
+          <? msg.attachments.forEach(file => { ?>
+            <? if (file.file_type === 'pdf') { ?>
+              <a href="/auth/ticket/attachments/<?= ticket.id ?>/<?= file.file_name ?>" target="_blank" class="mb-2">
+                <i class="bi bi-file-earmark-pdf"></i> <?= file.original_name || file.file_name ?>
+              </a>
+            <? } else { ?>
+              <a href="/auth/ticket/attachments/<?= ticket.id ?>/<?= file.file_name ?>" target="_blank" class="mb-2">
+                <img src="/auth/ticket/attachments/<?= ticket.id ?>/<?= file.file_name ?>" 
+                    alt="<?= file.original_name || file.file_name ?>" 
+                    class="img-thumbnail" style="max-width: 100px;">
+              </a>
+            <? } ?>
+          <? }); ?>
+        <? } else { ?>
+          <small class="text-muted">No attachments</small>
+        <? } ?>
+      </div>
+      </div>
+    </div>
+    <? }); ?>
+    <? } else { ?>
+    <p>No follow-ups yet.</p>
+    <? } ?>
+  </div>
+
+  <!-- Add Follow-up Form -->
+  <div class="card my-5">
+    <div class="card-header">Add Follow-up</div>
+    <div class="card-body">
+      <form action="/auth/ticket/<?= ticket.id ?>/reply" method="POST" enctype="multipart/form-data">
+        <div class="mb-3">
+          <label for="message_text" class="form-label">Message</label>
+          <textarea name="message_text" id="message_text" rows="4" class="form-control" required></textarea>
+        </div>
+        <div class="mb-3">
+          <label for="attachments" class="form-label">Attachments (images or PDFs)</label>
+          <input type="file" name="attachments" id="attachments" class="form-control" multiple
+            accept="image/*,application/pdf">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Follow-up</button>
+      </form>
+
+    </div>
+  </div>
+</div>

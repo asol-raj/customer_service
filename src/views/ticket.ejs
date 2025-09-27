@@ -1,0 +1,54 @@
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+
+            <!-- Page Header -->
+            <h2 class="mb-4 text-center">Create a Ticket</h2>
+
+            <!-- Success/Error Messages -->
+            <? if (error) { ?>
+            <div class="alert alert-danger">
+                <?= error ?>
+            </div>
+            <? } ?>
+            <? if (success) { ?>
+            <div class="alert alert-success">
+                <?= success ?>
+            </div>
+            <? } ?>
+
+            <!-- Ticket Form -->
+            <form action="/auth/ticket/create" method="POST" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="subject" class="form-label">Subject <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="subject" name="subject" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea class="form-control" id="description" name="description" rows="4"
+                        placeholder="Enter ticket details"></textarea>
+                </div>
+
+                <div class="row">
+                    <div class="mb-3 col-md-6">
+                        <label for="invoice_number" class="form-label">Invoice Number (Optional)</label>
+                        <input type="text" class="form-control" id="invoice_number" name="invoice_number">
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <label for="policy_number" class="form-label">Policy Number (Optional)</label>
+                        <input type="text" class="form-control" id="policy_number" name="policy_number">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="attachments" class="form-label">Attachments (Images/PDFs)</label>
+                    <input type="file" class="form-control" id="attachments" name="attachments" multiple>
+                    <div class="form-text">You can upload multiple files (images or PDFs).</div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">Submit Ticket</button>
+            </form>
+        </div>
+    </div>
+</div>
