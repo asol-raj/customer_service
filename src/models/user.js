@@ -14,7 +14,11 @@ const User = {
   // Find user by username
   findByUsername: async (username) => {
     const [rows] = await pool.query(
-      `SELECT * FROM users WHERE username = ? LIMIT 1`,
+      // Specify the columns needed for authentication
+       `SELECT id, username, password_hash, user_type 
+        FROM users 
+        WHERE username = ? AND is_active = true 
+        LIMIT 1;`,
       [username]
     );
     return rows[0] || null;
@@ -23,7 +27,7 @@ const User = {
   // Find user by ID
   findById: async (id) => {
     const [rows] = await pool.query(
-      `SELECT * FROM users WHERE id = ? LIMIT 1`,
+      `SELECT * FROM users WHERE id = ? AND is_active = true LIMIT 1`,
       [id]
     );
     return rows[0] || null;
@@ -32,7 +36,7 @@ const User = {
   // Get all users (basic info)
   getAll: async () => {
     const [rows] = await pool.query(
-      `SELECT id, username, user_type, created_at FROM users`
+      `SELECT id, username, user_type, is_active, created_at FROM users`
     );
     return rows;
   },

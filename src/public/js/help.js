@@ -476,7 +476,8 @@ export function createTableNew({
     fixTableHead = true,
     size = "small",
     colsToTotal = [],
-    caption = null
+    caption = null,
+    border = false
 }) {
     // If no data or empty data is provided, return false.
     if (!data || data.length === 0) {
@@ -488,6 +489,7 @@ export function createTableNew({
     const table = document.createElement("table");
     const thead = document.createElement("thead");
     const tbody = document.createElement("tbody");
+    tbody.classList.add('table-group-divider');
 
     // --- Create Table Header (thead) ---
     const headerRow = document.createElement("tr");
@@ -503,8 +505,9 @@ export function createTableNew({
     // Create headers from the keys of the first data object
     for (const key in data[0]) {
         const th = document.createElement("th");
+
         th.innerHTML = key; // Use innerHTML as original code did, but textContent is generally safer for plain text
-        th.className = "";
+        th.className = "text-capitalize";
         th.dataset.key = key; // Store the original key in a data attribute
         headerRow.append(th);
     }
@@ -599,8 +602,35 @@ export function createTableNew({
                 jq(this).text(parseLocals(this.textContent))
             })
         });
+
+    }
+
+    if(border){
+        const borderColor ='#ccc'
+        jq(table).find('tr').each(function () {
+            jq(this).children('th:not(:last-child), td:not(:last-child)').css({
+                'border-right': `1px solid ${borderColor}`
+            });
+        })
     }
 
     // Return an object containing references to the created elements
     return { table, tbody, thead, tfoot, data };
+}
+
+export function addColumnBorders($table, borderColor = '#ccc') {
+    if (!$table || !$table.length) return; // Safety check
+
+    // First remove any existing borders so it doesn't double-up
+    $table.find('th, td').css('border-right', 'none');
+
+    // Apply right border to all cells except the last in each row
+    $table.find('tr').each(function () {
+        jq(this).children('th:not(:last-child), td:not(:last-child)').css({
+            'border-right': `1px solid ${borderColor}`
+        });
+    });
+
+    // Ensure no outer table border
+    $table.css('border-right', 'none');
 }
