@@ -40,5 +40,16 @@ export default {
     client: {
         client_name: { label: 'Client Name', type: 'text', required: true },
         short_name: { label: 'Short Name', type: 'text', }
+    },
+
+    userdetails: {
+        first_name: { label: 'Firts Name', type: 'text' },
+        middle_name: { label: 'Middle Name', type: 'text' },
+        last_name: { label: 'Last Name', type: 'text' },
+        address: { label: 'Address', type: 'textarea' },
+        city: { label: 'City', type: 'text' },
+        zipcode: { label: 'Zipcode', type: 'text' },
+        state: { label: 'State Name', type: 'text' },
+        user_id: { type: 'hidden' }
     }
 }

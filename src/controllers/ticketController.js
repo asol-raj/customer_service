@@ -236,7 +236,25 @@ const TicketController = {
       console.error('addFollowUp error:', err);
       return res.status(500).render('500', { message: 'Something went wrong' });
     }
-  }
+  },
+
+  editMessage: async(req, res)=>{
+    try {
+      const { id, message } = req.body;      
+      if (!id) return res.status(400).json({ error: 'Missing Message id' });
+      if (!message) return res.status(400).json({ error: 'Message text is required!' });
+      let result = await Tickets.updateMessage(id, message);
+      return res.status(201).json({ status: true, result })
+    } catch (error) {
+        console.error('addFollowUp error:', error);
+        return res.status(500).json({ status: false,  message: 'Something went wrong' });
+    }
+  },
+
+  
+
+
+
 
 
 };

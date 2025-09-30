@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const verifyToken = require('../middleware/auth');
+const verifyToken = require('../middleware/authMw');
 const TicketController = require('../controllers/ticketController');
 const multer = require('multer');
 const { nanoid } = require('nanoid');
@@ -46,6 +46,8 @@ router.get('/:id', TicketController.getTicketById);
 router.post('/create', upload.array('attachments', MAX_FILES), TicketController.createTicket);
 // POST follow-up
 router.post('/:id/reply', upload.array('attachments', MAX_FILES), TicketController.addFollowUp);
+router.post('/message/update', TicketController.editMessage);
+
 
 // staff routes
 

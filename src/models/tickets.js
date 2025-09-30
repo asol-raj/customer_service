@@ -81,6 +81,14 @@ const Tickets = {
     );
 
     return result.affectedRows > 0;
+  },
+
+  updateMessage: async(id, message)=>{
+    const [result] = await pool.query(
+      `UPDATE messages SET message_text = COALESCE(?, message_text) WHERE id =?;`, [message, id]
+    );
+
+    return result.affectedRows >0;
   }
 };
 

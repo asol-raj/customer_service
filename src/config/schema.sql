@@ -1,32 +1,32 @@
 -- Active: 1758704013034@@127.0.0.1@3306@customer_service
--- CREATE DATABASE IF NOT EXISTS `customer_service`;
--- CREATE USER IF NOT EXISTS 'user_cs'@'%' IDENTIFIED BY '269608Raj$';
--- GRANT ALL PRIVILEGES ON `customer_service`.* TO 'user_cs'@'%' WITH GRANT OPTION;
+CREATE DATABASE IF NOT EXISTS `customer_service`;
+CREATE USER IF NOT EXISTS 'user_cs'@'%' IDENTIFIED BY '269608Raj$';
+GRANT ALL PRIVILEGES ON `customer_service`.* TO 'user_cs'@'%' WITH GRANT OPTION;
+DROP TABLE attachments, messages, user_details, tickets,  users;
 
 -- USERS
 CREATE TABLE IF NOT EXISTS `users` (
     `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     `username` VARCHAR(50) NULL UNIQUE,
     `password_hash` CHAR(60) NOT NULL,
-    `user_type` ENUM('customer', 'staff', 'agency') NOT NULL DEFAULT 'customer',
+    `user_type` ENUM('customer', 'staff', 'agent') NOT NULL DEFAULT 'customer',
     `is_active` BOOLEAN DEFAULT true,
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
--- ALTER Table users MODIFY COLUMN user_type ENUM('customer', 'staff', 'agency') NOT NULL DEFAULT 'customer';
+-- ALTER TABLE `users` MODIFY COLUMN user_type ENUM('customer', 'staff', 'agent') NOT NULL DEFAULT 'customer';
 
--- USER DETAILS
 CREATE TABLE IF NOT EXISTS `user_details` (
     `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     `user_id` INT UNSIGNED NOT NULL,
-    `first_name` VARCHAR(50) NOT NULL,
+    `first_name` VARCHAR(50) NULL,
     `middle_name` VARCHAR(50) NULL,
-    `last_name` VARCHAR(50) NOT NULL,
+    `last_name` VARCHAR(50) NULL,
     `address` VARCHAR(200) NULL,
     `city` VARCHAR(100) NULL,
     `zipcode` VARCHAR(15) NULL,
     `state` VARCHAR(100) NULL,
-    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT `fk_user_details_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 

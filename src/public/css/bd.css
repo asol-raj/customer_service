@@ -1,0 +1,12 @@
+.btn-bd-accent {
+    --bs-btn-font-weight: 600;
+    --bs-btn-color: var(--bd-accent);
+    --bs-btn-border-color: var(--bd-accent);
+    --bs-btn-hover-color: var(--bd-dark);
+    --bs-btn-hover-bg: var(--bd-accent);
+    --bs-btn-hover-border-color: var(--bd-accent);
+    --bs-btn-focus-shadow-rgb: var(--bd-accent-rgb);
+    --bs-btn-active-color: var(--bs-btn-hover-color);
+    --bs-btn-active-bg: var(--bs-btn-hover-bg);
+    --bs-btn-active-border-color: var(--bs-btn-hover-border-color);
+}

@@ -36,7 +36,8 @@ app.use((req, res, next) => {
 });
 
 // app.get('/', (req, res)=> res.render('index'));
-app.use('/', require('./src/routes/router'));
+// app.get('/test', (req, res) => res.type('text').send('TEST from app.js'));
+app.use('/', require('./src/routes/_router'));
 
 // CATCH-ALL ROUTE (MUST be AFTER all other specific routes)
 app.use((req, res, next) => {

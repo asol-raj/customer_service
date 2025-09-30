@@ -481,8 +481,8 @@ export function createTableNew({
 }) {
     // If no data or empty data is provided, return false.
     if (!data || data.length === 0) {
-        console.warn("createTable: No data or empty data provided.");
-        return false;
+        console.log("createTable: No data or empty data provided.");
+        return { table: 'No Records Found!'};
     }
 
     // Create table elements

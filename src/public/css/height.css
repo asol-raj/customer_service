@@ -1,0 +1,107 @@
+/* Custom Responsive Bootstrap Height Utilities
+  -------------------------------------------
+  Add this code to your custom CSS file and link it in your HTML 
+  AFTER the main Bootstrap CSS file.
+
+  Usage:
+  - .h-[value]         (for xs and up)
+  - .h-sm-[value]      (for sm and up)
+  - .h-md-[value]      (for md and up)
+  - .h-lg-[value]      (for lg and up)
+  - .h-xl-[value]      (for xl and up)
+  - .h-xxl-[value]     (for xxl and up)
+
+  Example: <div class="w-100 w-md-50 w-lg-30"></div>
+  This div will be 100% wide on small screens, 50% wide on medium screens 
+  and up, and 30% wide on large screens and up.
+*/
+
+/* Default (xs) heights */
+.h-10 { height: 10% !important; }
+.h-20 { height: 20% !important; }
+.h-30 { height: 30% !important; }
+.h-40 { height: 40% !important; }
+.h-60 { height: 60% !important; }
+.h-70 { height: 70% !important; }
+.h-80 { height: 80% !important; }
+.h-90 { height: 90% !important; }
+
+/* Small devices (sm, 576px and up) */
+@media (min-height: 576px) {
+  .h-sm-10 { height: 10% !important; }
+  .h-sm-20 { height: 20% !important; }
+  .h-sm-25 { height: 25% !important; }
+  .h-sm-30 { height: 30% !important; }
+  .h-sm-40 { height: 40% !important; }
+  .h-sm-50 { height: 50% !important; }
+  .h-sm-60 { height: 60% !important; }
+  .h-sm-70 { height: 70% !important; }
+  .h-sm-75 { height: 75% !important; }
+  .h-sm-80 { height: 80% !important; }
+  .h-sm-90 { height: 90% !important; }
+  .h-sm-100 { height: 100% !important; }
+}
+
+/* Medium devices (md, 768px and up) */
+@media (min-height: 768px) {
+  .h-md-10 { height: 10% !important; }
+  .h-md-20 { height: 20% !important; }
+  .h-md-25 { height: 25% !important; }
+  .h-md-30 { height: 30% !important; }
+  .h-md-40 { height: 40% !important; }
+  .h-md-50 { height: 50% !important; }
+  .h-md-60 { height: 60% !important; }
+  .h-md-70 { height: 70% !important; }
+  .h-md-75 { height: 75% !important; }
+  .h-md-80 { height: 80% !important; }
+  .h-md-90 { height: 90% !important; }
+  .h-md-100 { height: 100% !important; }
+}
+
+/* Large devices (lg, 992px and up) */
+@media (min-height: 992px) {
+  .h-lg-10 { height: 10% !important; }
+  .h-lg-20 { height: 20% !important; }
+  .h-lg-25 { height: 25% !important; }
+  .h-lg-30 { height: 30% !important; }
+  .h-lg-40 { height: 40% !important; }
+  .h-lg-50 { height: 50% !important; }
+  .h-lg-60 { height: 60% !important; }
+  .h-lg-70 { height: 70% !important; }
+  .h-lg-75 { height: 75% !important; }
+  .h-lg-80 { height: 80% !important; }
+  .h-lg-90 { height: 90% !important; }
+  .h-lg-100 { height: 100% !important; }
+}
+
+/* Extra large devices (xl, 1200px and up) */
+@media (min-height: 1200px) {
+  .h-xl-10 { height: 10% !important; }
+  .h-xl-20 { height: 20% !important; }
+  .h-xl-25 { height: 25% !important; }
+  .h-xl-30 { height: 30% !important; }
+  .h-xl-40 { height: 40% !important; }
+  .h-xl-50 { height: 50% !important; }
+  .h-xl-60 { height: 60% !important; }
+  .h-xl-70 { height: 70% !important; }
+  .h-xl-75 { height: 75% !important; }
+  .h-xl-80 { height: 80% !important; }
+  .h-xl-90 { height: 90% !important; }
+  .h-xl-100 { height: 100% !important; }
+}
+
+/* Extra extra large devices (xxl, 1400px and up) */
+@media (min-height: 1400px) {
+  .h-xxl-10 { height: 10% !important; }
+  .h-xxl-20 { height: 20% !important; }
+  .h-xxl-25 { height: 25% !important; }
+  .h-xxl-30 { height: 30% !important; }
+  .h-xxl-40 { height: 40% !important; }
+  .h-xxl-50 { height: 50% !important; }
+  .h-xxl-60 { height: 60% !important; }
+  .h-xxl-70 { height: 70% !important; }
+  .h-xxl-75 { height: 75% !important; }
+  .h-xxl-80 { height: 80% !important; }
+  .h-xxl-90 { height: 90% !important; }
+  .h-xxl-100 { height: 100% !important; }
+}

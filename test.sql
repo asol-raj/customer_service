@@ -1,6 +1,10 @@
 -- Active: 1758704013034@@127.0.0.1@3306@customer_service
 
+-- DROP TABLE IF EXISTS `users`;
 SELECT * FROM users;
+-- TRUNCATE table users;
+
+SELECT * FROM user_details;
 
 SELECT * FROM messages;
 

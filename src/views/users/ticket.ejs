@@ -4,8 +4,12 @@
     <div class="card-body">
       <div class="row">
         <div class="col-4">
-          <h4> # <?= ticket.id ?> </h4>
-          <h5> <?= ticket.subject ?> </h5>
+          <h4> #
+            <?= ticket.id ?>
+          </h4>
+          <h5>
+            <?= ticket.subject ?>
+          </h5>
           <p class="text-muted">Created:
             <?= new Date(ticket.created_at).toLocaleString() ?>
           </p>
@@ -37,23 +41,45 @@
   </div>
 
   <!-- Messages / Follow-ups -->
-  <div class="d-flex flex-column gap-3">
+  <div id="messagesWrap" class="d-flex flex-column gap-3">
     <? if (messages && messages.length > 0) { ?>
-    <? messages.forEach(msg => { ?>
-    <div class="card p-3 <?- msg.author_type === 'staff'? 'bg-light' : ''?>">
+    <? messages.forEach((msg, index) => { ?>
+    <div id="msg-<?= msg.id ?>" class="card p-3 <?- msg.author_type === 'staff' ? 'bg-light' : '' ?>"
+      data-msg-id="<?= msg.id ?>">
       <div class="d-flex justify-content-between">
-        <!-- Message Text -->
         <div class="flex-grow-1 me-3">
-          <p class="mb-1 fw-semibold"><?- msg.author_type === 'staff'? 'Reply' : 'Message'?></p>
-          <p class="mb-1">
+          <p class="mb-1 fw-semibold"><?- msg.author_type === 'staff' ? 'Reply' : 'Message' ?></p>
+
+          <!-- displayed text node -->
+           <!-- style="white-space: pre-wrap;" -->
+          <p class="mb-1 message-text" >
             <?= msg.message_text ?>
           </p>
-          <small class="text-muted">By
-            <?= msg.author_name ?>
-            (
+
+          <small class="text-muted">
+            By
+            <?= msg.author_name ?> (
             <?= msg.author_type ?>) at
             <?= new Date(msg.created_at).toLocaleString() ?>
           </small>
+
+          <? if (msg.author_type === user.user_type) { ?>
+          <? if (user.user_type === 'customer' && index > 0) { ?>
+          <button class="btn btn-sm edit-msg" value="<?= msg.id ?>" title="Edit Post">
+            <i class="bi bi-pencil-square"></i>
+          </button>
+          <button class="btn btn-sm delete-msg" value="<?= msg.id ?>" title="Delete Post">
+            <i class="bi bi-trash3 text-red"></i>
+          </button>
+          <? } else if (user.user_type === 'staff') { ?>
+          <button class="btn btn-sm edit-msg" value="<?= msg.id ?>" title="Edit Post">
+            <i class="bi bi-pencil-square"></i>
+          </button>
+          <button class="btn btn-sm delete-msg" value="<?= msg.id ?>" title="Delete Post">
+            <i class="bi bi-trash3 text-red"></i>
+          </button>
+          <? } ?>
+          <? } ?>
         </div>
 
         <!-- Attachments -->
@@ -84,6 +110,7 @@
     <? } ?>
   </div>
 
+
   <!-- Add Follow-up Form -->
   <div class="card my-5">
     <div class="card-header">Add Follow-up</div>
@@ -104,3 +131,118 @@
     </div>
   </div>
 </div>
+
+
+<script>
+  // Optional: pick CSRF token if you expose one via <meta name="csrf-token" content="...">
+  // const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
+  const wrap = document.getElementById('messagesWrap'); // container that wraps all messages
+
+  wrap.addEventListener('click', async (e) => {
+    const editBtn = e.target.closest('.edit-msg');
+    const saveBtn = e.target.closest('.save-msg');
+    const cancelBtn = e.target.closest('.cancel-edit');
+
+    // === EDIT clicked: swap <p.message-text> -> <textarea> + Save/Cancel ===
+    if (editBtn) {
+      const card = editBtn.closest('[data-msg-id]') || editBtn.closest('#msg-' + editBtn.value) || editBtn.closest('.card');
+      if (!card) return;
+
+      // Avoid opening multiple editors for the same card
+      if (card.querySelector('form.inline-edit-form')) return;
+
+      const textEl = card.querySelector('.message-text');
+      if (!textEl) return;
+
+      const originalText = textEl.textContent; // keep as plain text
+
+      // Hide original text and inject inline form
+      textEl.style.display = 'none';
+
+      const form = document.createElement('form');
+      form.className = 'inline-edit-form mt-2';
+      form.dataset.msgId = editBtn.value; // keep id on the form for convenience
+      form.innerHTML = `
+        <div class="mb-2">
+          <textarea class="form-control edit-textarea" rows="3">${originalText.trim()}</textarea>
+        </div>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-sm btn-primary save-msg" value="${editBtn.value}">Save</button>
+          <button type="button" class="btn btn-sm btn-secondary cancel-edit">Cancel</button>
+        </div>
+        <div class="small text-muted mt-1 edit-hint d-none">Saving…</div>
+        <div class="small text-danger mt-1 edit-error d-none"></div>
+      `;
+      textEl.after(form);
+      return;
+    }
+
+    // === CANCEL clicked: restore original text ===
+    if (cancelBtn) {
+      const form = cancelBtn.closest('form.inline-edit-form');
+      const card = cancelBtn.closest('.card');
+      const textEl = card?.querySelector('.message-text');
+      if (form && textEl) {
+        form.remove();
+        textEl.style.display = '';
+      }
+      return;
+    }
+
+    // === SAVE clicked: call /messge/update and update DOM on success ===
+    if (saveBtn) {
+      const msgId = saveBtn.value; // from button value attribute
+      const form = saveBtn.closest('form.inline-edit-form');
+      const card = saveBtn.closest('.card');
+      const textEl = card?.querySelector('.message-text');
+      const textarea = form?.querySelector('.edit-textarea');
+      const hint = form?.querySelector('.edit-hint');
+      const errBox = form?.querySelector('.edit-error');
+
+      if (!msgId || !form || !textEl || !textarea) return;
+
+      const newText = textarea.value.trim();
+      if (!newText) {
+        // simple client-side validation
+        errBox.classList.remove('d-none');
+        errBox.textContent = 'Message text is required.';
+        return;
+      }
+
+      // UI: indicate saving & disable buttons to prevent double submit
+      hint?.classList.remove('d-none');
+      errBox?.classList.add('d-none');
+      const buttons = form.querySelectorAll('button');
+      buttons.forEach(b => b.disabled = true);
+
+      try {
+        const res = await fetch('/auth/ticket/message/update', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            // ...(csrfToken ? { 'X-CSRF-Token': csrfToken } : {})
+          },
+          body: JSON.stringify({ id: msgId, message: newText })
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok || data?.status !== true) {
+          throw new Error(data?.error || data?.message || 'Update failed');
+        }
+
+        // Success: update UI text and close editor
+        textEl.textContent = newText; // keep plain text (prevents HTML injection)
+        form.remove();
+        textEl.style.display = '';
+      } catch (err) {
+        // Show error & re-enable buttons
+        errBox?.classList.remove('d-none');
+        errBox.textContent = err.message || 'Something went wrong.';
+        buttons.forEach(b => b.disabled = false);
+        hint?.classList.add('d-none');
+      }
+    }
+  });
+</script>

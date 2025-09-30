@@ -2,10 +2,7 @@ const express = require('express');
 const router = express.Router();
 const TicketController = require('../controllers/ticketController');
 
-router.use((req, res, next) => {
-    res.locals.user = req.user;
-    next();
-})
+
 
 router.get('/dashboard', (req, res) => res.render('staff/dashboard'));
 router.get('/tickets/open-tickets', (req, res) => res.render('staff/tickets'));
