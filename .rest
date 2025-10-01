@@ -2,8 +2,8 @@ POST http://localhost:6200/register
 Content-Type: application/json
 
 {
-  "username": "agent",
+  "username": "admin",
   "password": "269608",
-  "user_type": "agent"
+  "user_type": "staff"
 }
 

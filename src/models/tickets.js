@@ -85,7 +85,7 @@ const Tickets = {
 
   updateMessage: async(id, message)=>{
     const [result] = await pool.query(
-      `UPDATE messages SET message_text = COALESCE(?, message_text) WHERE id =?;`, [message, id]
+      `UPDATE messages SET message_text = COALESCE(?, message_text), updated_at = NOW() WHERE id =?;`, [message, id]
     );
 
     return result.affectedRows >0;

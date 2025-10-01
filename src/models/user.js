@@ -86,16 +86,24 @@ const User = {
   updateUserDetails: async (details) => {
     const {
       first_name, middle_name, last_name, address, city,
-      zipcode, state, user_id } = details;
+      zipcode, state, contact, email_address, user_id } = details;
+      
 
     const [result] = await pool.execute(
       `UPDATE user_details
-       SET first_name = ?, middle_name = ?, last_name = ?, address = ?,
-           city = ?, zipcode = ?, state = ?
+        SET first_name = COALESCE(?, first_name), 
+            middle_name = COALESCE(?, middle_name), 
+            last_name = COALESCE(?, last_name), 
+            address = COALESCE(?, address), 
+            city = COALESCE(?, city), 
+            zipcode = COALESCE(?, zipcode), 
+            state = COALESCE(?, state), 
+            contact = COALESCE(?, contact), 
+            email_address = COALESCE(?, email_address), 
+            updated_at = NOW()
        WHERE user_id = ?`,
-      [first_name, middle_name, last_name, address, city, zipcode, state, user_id]
+      [first_name, middle_name, last_name, address, city, zipcode, state, contact, email_address, user_id]
     );
-
     return result.affectedRows > 0;
   },
 
@@ -154,8 +162,8 @@ const User = {
   getUserWithDetails: async (user_id) => {
     const [rows] = await pool.execute(
       `SELECT u.id, u.username, u.user_type, u.is_active, u.created_at,
-              d.first_name, d.middle_name, d.last_name,
-              d.address, d.city, d.zipcode, d.state, d.updated_at
+              d.user_id, d.first_name, d.middle_name, d.last_name,
+              d.address, d.city, d.zipcode, d.state, d.contact, d.email_address, d.avatar, d.updated_at
        FROM users u
        LEFT JOIN user_details d ON u.id = d.user_id
        WHERE u.id = ?`,

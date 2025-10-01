@@ -2,7 +2,7 @@
 CREATE DATABASE IF NOT EXISTS `customer_service`;
 CREATE USER IF NOT EXISTS 'user_cs'@'%' IDENTIFIED BY '269608Raj$';
 GRANT ALL PRIVILEGES ON `customer_service`.* TO 'user_cs'@'%' WITH GRANT OPTION;
-DROP TABLE attachments, messages, user_details, tickets,  users;
+-- DROP TABLE attachments, messages, user_details, tickets,  users;
 
 -- USERS
 CREATE TABLE IF NOT EXISTS `users` (
@@ -26,10 +26,14 @@ CREATE TABLE IF NOT EXISTS `user_details` (
     `city` VARCHAR(100) NULL,
     `zipcode` VARCHAR(15) NULL,
     `state` VARCHAR(100) NULL,
+    `contact` VARCHAR(50) DEFAULT NULL,
+    `email_address` VARCHAR(100) DEFAULT NULL,
+    `avatar` VARCHAR(255) NULL,
     `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT `fk_user_details_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
+-- ALTER TABLE `user_details` ADD COLUMN `avatar` VARCHAR(255) NULL after `email_address`;
 -- TICKETS
 CREATE TABLE IF NOT EXISTS `tickets` (
     `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -55,14 +59,17 @@ CREATE TABLE IF NOT EXISTS `tickets` (
 -- MESSAGES (conversation inside a ticket)
 CREATE TABLE IF NOT EXISTS `messages` (
     `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    `ticket_id` INT UNSIGNED NOT NULL,
     `user_id` INT UNSIGNED NOT NULL, -- sender (customer or staff)
+    `ticket_id` INT UNSIGNED NOT NULL,
     `message_text` TEXT NULL,
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT `fk_messages_ticket` FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_messages_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
+-- ALTER Table messages ADD COLUMN updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP after created_at;
+-- ALTER TABLE messages MODIFY COLUMN `updated_at` DATETIME NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP;
 -- ATTACHMENTS (images, PDFs)
 CREATE TABLE IF NOT EXISTS `attachments` (
     `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,

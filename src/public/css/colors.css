@@ -10,6 +10,9 @@
   - etc.
 */
 
+.bg-notice { background-color: #303f9f !important;}
+.text-notice { color: #303f9f !important; }
+
 .bg-landing { background: linear-gradient(90deg, #0d274c, #1c53a3); }
 
 /* Reds & Pinks */

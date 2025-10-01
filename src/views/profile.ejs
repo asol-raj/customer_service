@@ -1,0 +1,82 @@
+<div class="container">
+    <h4 class="my-5">Profile</h4>
+
+
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Success/Error Messages -->
+            <? if (error) { ?>
+            <div class="alert alert-danger">
+                <?= error ?>
+            </div>
+            <? } ?>
+            <? if (success) { ?>
+            <div class="alert alert-success">
+                <?= success ?>
+            </div>
+            <? } ?>
+
+            <form action="/auth/profile" class="my-4" method="post">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label for="firstName" class="form-label">First Name</label>
+                        <input type="text" id="firstName" value="<?= profile.first_name ?>" name="first_name"
+                            class="form-control form-control-lg">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="middleName" class="form-label">Middle Name</label>
+                        <input type="text" id="middleName" value="<?= profile.middle_name ?>" name="middle_name"
+                            class="form-control form-control-lg">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="lastName" class="form-label">Last Name</label>
+                        <input type="text" id="lastName" value="<?= profile.last_name ?>" name="last_name"
+                            class="form-control form-control-lg">
+                    </div>
+                </div>
+                <div class="row my-4">
+                    <div class="col">
+                        <label for="address" class="form-label">Address</label>
+                        <textarea name="address" id="address" class="form-control"
+                            rows="4"><?= profile.address ?></textarea>
+                    </div>
+                </div>
+                <div class="row my-4">
+                    <div class="col-md-4">
+                        <label for="city" class="form-label">City</label>
+                        <input type="text" id="city" value="<?= profile.city ?>" name="city"
+                            class="form-control form-control-lg">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="zipCode" class="form-label">Zip Code</label>
+                        <input type="text" id="zipCode" value="<?= profile.zipcode ?>" name="zipcode"
+                            class="form-control form-control-lg">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="state" class="form-label">State</label>
+                        <input type="text" id="state" value="<?= profile.state ?>" name="state"
+                            class="form-control form-control-lg">
+                    </div>
+                </div>
+                <div class="row mb-5">
+                    <div class="col-md-4">
+                        <label for="contact" class="form-label">Contact Number</label>
+                        <input type="text" id="contact" value="<?= profile.contact ?>" name="contact"
+                            class="form-control form-control-lg">
+                    </div>
+                    <div class="col-md-8">
+                        <label for="email_address" class="form-label">Email Address</label>
+                        <input type="text" id="email_address" value="<?= profile.email_address ?>" name="email_address"
+                            class="form-control form-control-lg">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <input type="hidden" name="user_id" value="<?= profile.user_id ?>">
+                        <button type="submit" class="btn btn-outline-primary btn-lg submit">Submit</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

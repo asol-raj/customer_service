@@ -8,6 +8,8 @@ const path = require('path');
 const fs = require('fs');
 const pool = require('../config/db');
 
+// all routes start here with /auth/ticket
+
 // console.log(path.join(__dirname, '../uploads'));
 // Configure multer storage
 const storage = multer.diskStorage({
@@ -47,6 +49,7 @@ router.post('/create', upload.array('attachments', MAX_FILES), TicketController.
 // POST follow-up
 router.post('/:id/reply', upload.array('attachments', MAX_FILES), TicketController.addFollowUp);
 router.post('/message/update', TicketController.editMessage);
+router.post('/message/delete', TicketController.deleteMessage);
 
 
 // staff routes

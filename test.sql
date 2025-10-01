@@ -6,7 +6,12 @@ SELECT * FROM users;
 
 SELECT * FROM user_details;
 
-SELECT * FROM messages;
+SELECT 
+    ROW_NUMBER() OVER (ORDER BY id) AS sn,
+    m.*
+FROM messages m
+WHERE m.ticket_id = 3;
+
 
 SELECT * FROM tickets;
 

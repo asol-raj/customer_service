@@ -78,7 +78,8 @@ const TicketController = {
         }
       }
 
-      return res.render('ticket', { user: req.user, error: null, success: 'Ticket created successfully!' });
+      // return res.render('ticket', { user: req.user, error: null, success: 'Ticket created successfully!' });
+      return res.redirect('/auth/dashboard')
 
     } catch (err) {
       console.error(err);
@@ -109,10 +110,12 @@ const TicketController = {
 
       // 3) load messages (follow-ups) with author info
       const [messages] = await pool.query(
-      `SELECT 
+        `SELECT 
+          ROW_NUMBER() OVER (ORDER BY m.id) AS sn,
           m.id,
           m.message_text,
           m.created_at,
+          m.updated_at,
           u.username,
           u.user_type,
           ud.first_name,
@@ -157,7 +160,7 @@ const TicketController = {
       // 7) render the right view based on role
       const view = (user.user_type === 'staff') ? 'staff/ticket' : 'users/ticket';
 
-      return res.render(view, {
+      return res.render('followups', {
         ticket,
         messages: messagesWithAttachments,
         followUps: messagesWithAttachments, // alias for backward compatibility
@@ -199,7 +202,7 @@ const TicketController = {
 
       // 3) insert message
       const [result] = await pool.query(
-        'INSERT INTO messages (ticket_id, user_id, message_text) VALUES (?, ?, ?)',
+        'INSERT INTO messages (ticket_id, user_id, message_text, updated_at) VALUES (?, ?, ?, now())',
         [ticketId, user.id, message_text]
       );
       const messageId = result.insertId;
@@ -238,24 +241,40 @@ const TicketController = {
     }
   },
 
-  editMessage: async(req, res)=>{
+  editMessage: async (req, res) => {
     try {
-      const { id, message } = req.body;      
+      const { id, message, ticketId } = req.body;
       if (!id) return res.status(400).json({ error: 'Missing Message id' });
       if (!message) return res.status(400).json({ error: 'Message text is required!' });
       let result = await Tickets.updateMessage(id, message);
+      // return res.redirect('/auth/ticket/' + id);
       return res.status(201).json({ status: true, result })
     } catch (error) {
-        console.error('addFollowUp error:', error);
-        return res.status(500).json({ status: false,  message: 'Something went wrong' });
+      console.error('addFollowUp error:', error);
+      return res.status(500).json({ status: false, message: 'Something went wrong' });
     }
   },
 
-  
+  deleteMessage: async (req, res) => {
+    try {
+      const { id } = req.body;   // ✅ fixed typo
+      if (!id) {
+        return res.status(400).json({ status: false, error: 'Missing message id' });
+      }
 
+      const [result] = await pool.query(`DELETE FROM messages WHERE id = ?`, [id]); // ✅ added await
 
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ status: false, message: 'Message not found' });
+      }
 
+      return res.status(200).json({ status: true, message: 'Message deleted successfully' });
 
+    } catch (error) {
+      console.error('deleteMessage error:', error);
+      return res.status(500).json({ status: false, message: 'Something went wrong' });
+    }
+  }
 
 };
 

@@ -10,8 +10,8 @@ const AuthController = {
   // Register customer
   register: async (req, res) => {
     try {
-      const { 
-        username, password, user_type='customer',
+      const {
+        username, password, user_type = 'customer',
         first_name = null, middle_name = null, last_name = null,
         address = null, city = null, zipcode, state = null
       } = req.body;
@@ -68,20 +68,17 @@ const AuthController = {
     }
   },
 
-  // ==========================
-  // New User Controllers
-  // ==========================
-
   // Get user with details
   getUserWithDetails: async (req, res) => {
     try {
-      const { id } = req.params;
-      const user = await User.getUserWithDetails(id);
-      if (!user) return res.status(404).json({ status: false, error: 'User not found' });
-      res.json(user);
+      const { id } = req.user;
+      // return res.json({ user: req.user.id});
+      const profile = await User.getUserWithDetails(id);
+      if (!profile) return res.status(404).json({ error: 'User not found', success: null });
+      return res.render('profile', { profile, error: null, success: null })
     } catch (err) {
       console.error(err);
-      res.status(500).json({ status: true, error: 'Server error' });
+      res.status(500).json({ error: 'Server error', success: null });
     }
   },
 
@@ -89,12 +86,32 @@ const AuthController = {
   updateUserDetails: async (req, res) => {
     try {
       // const { id } = req.params;
-      const updated = await User.updateUserDetails(req.body);
-      if (!updated) return res.status(404).json({ error: 'User not found or not updated' });
-      res.json({status: true, message: 'User details updated successfully' });
+      const result = await User.updateUserDetails(req.body);
+      if (!result) return res.status(404).json({ error: 'User not found or not updated', success: null });
+      res.json({ error: null, success: 'User details updated successfully' });
     } catch (err) {
       console.error(err);
-      res.status(500).json({ status: false,  error: 'Server error' });
+      res.status(500).json({ success: null, error: 'Server error' });
+    }
+  },
+
+  updaetUserProfile: async (req, res) => {
+    try {
+      // const { id } = req.params;
+      const id = req.body.user_id
+      const result = await User.updateUserDetails(req.body);
+      const profile = await User.getUserWithDetails(id);
+      if (!result) {
+        return res.status(404).render('profile', { success: null, error: 'User not found or not updated', profile })
+        // return res.status(404).json({ error: 'User not found or not updated' });
+      }
+      // if (!profile) return res.status(404).json({ status: false, error: 'User not found' });
+      return res.render('profile', { error: null, success: 'User details updated successfully', profile })
+      // res.json({ status: true, message: 'User details updated successfully' });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).render('profile', { success: null, error: 'Server error', profile: {} })
+      // res.status(500).json({ status: false, error: 'Server error' });
     }
   },
 
@@ -138,7 +155,7 @@ const AuthController = {
       console.error(err);
       res.status(500).json({ status: false, error: 'Server error' });
     }
-  }
+  },
 };
 
 module.exports = AuthController;
