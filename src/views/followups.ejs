@@ -1,148 +1,155 @@
 <div class="container mt-5">
-  <!-- Ticket Header -->
-  <div class="card mb-4">
-    <div class="card-body">
-      <div class="row">
-        <div class="col-4">
-          <input type="hidden" value="<?= ticket.id ?>" id="ticketId">
-          <h4 id="ticketId"> #
-            <?= ticket.id ?>
-          </h4>
-          <h5>
-            <?= ticket.subject ?>
-          </h5>
-          <p class="text-muted">Created:
-            <?= new Date(ticket.created_at).toLocaleString() ?>
-          </p>
-        </div>
-        <div class="col-4">
-          <? if (ticket.invoice_number) { ?>
-          <p><strong>Invoice #:</strong>
-            <?= ticket.invoice_number ?>
-          </p>
-          <? } ?>
-          <? if (ticket.policy_number) { ?>
-          <p><strong>Policy #:</strong>
-            <?= ticket.policy_number ?>
-          </p>
-          <? } ?>
-        </div>
-        <div class="col-4 d-flex justify-content-end align-items-center">
-          <p><strong>Status:</strong>
-            <span class="badge 
+    <!-- Ticket Header -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-4">
+                    <input type="hidden" value="<?= ticket.id ?>" id="ticketId">
+                    <h4 id="ticketId"> #
+                        <?= ticket.id ?>
+                    </h4>
+                    <h5>
+                        <?= ticket.subject ?>
+                    </h5>
+                    <p class="text-muted">Created:
+                        <?= new Date(ticket.created_at).toLocaleString() ?>
+                    </p>
+                </div>
+                <div class="col-4">
+                    <? if (ticket.invoice_number) { ?>
+                    <p><strong>Invoice #:</strong>
+                        <?= ticket.invoice_number ?>
+                    </p>
+                    <? } ?>
+                    <? if (ticket.policy_number) { ?>
+                    <p><strong>Policy #:</strong>
+                        <?= ticket.policy_number ?>
+                    </p>
+                    <? } ?>
+                </div>
+                <div class="col-4 d-flex justify-content-end align-items-center">
+                    <p><strong>Status:</strong>
+                        <span class="badge 
               <?= ticket.status === 'open' ? 'bg-success' : 
                   ticket.status === 'in_progress' ? 'bg-warning text-dark' : 
                   ticket.status === 'resolved' ? 'bg-primary' : 'bg-secondary' ?>">
-              <?= ticket.status ?>
-            </span>
-          </p>
+                            <?= ticket.status ?>
+                        </span>
+                    </p>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 
-  <!-- Messages / Follow-ups -->
-  <div id="messagesWrap" class="d-flex flex-column gap-3">
-    <? if (messages && messages.length > 0) { ?>
-    <? messages.forEach((msg, index) => { ?>
-    <div id="msg-<?= msg.id ?>" class="card p-3 <?- msg.author_type === 'staff' ? 'bg-light' : '' ?>"
-      data-msg-id="<?= msg.id ?>">
-      <div class="d-flex justify-content-between">
-        <div class="flex-grow-1 me-3">
-          <p class="mb-1 fw-semibold">
-            #<?= msg.sn ?>
-            <?- msg.author_type === 'staff' ? 'Reply' : 'Message' ?>
-          </p>
+    <!-- Messages / Follow-ups -->
+    <div id="messagesWrap" class="d-flex flex-column gap-3">
+        <? if (messages && messages.length > 0) { ?>
+        <? messages.forEach((msg, index) => { ?>
+        <div id="msg-<?= msg.id ?>" class="card p-3 <?- msg.author_type === 'staff' ? 'bg-light' : '' ?>"
+            data-msg-id="<?= msg.id ?>">
+            <div class="d-flex justify-content-between">
+                <div class="flex-grow-1 me-3">
+                    <p class="mb-1 fw-semibold">
+                        #
+                        <?= msg.sn ?>
+                        <?- msg.author_type === 'staff' ? 'Reply' : 'Message' ?>
+                    </p>
 
-          <!-- displayed text node -->
-          <!-- style="white-space: pre-wrap;" -->
-          <p class="mb-1 message-text">
-            <?= msg.message_text ?>
-          </p>
+                    <!-- displayed text node -->
+                    <!-- style="white-space: pre-wrap;" -->
+                    <p class="mb-1 message-text">
+                        <?= msg.message_text ?>
+                    </p>
 
-          <small class="text-muted">
-            By
-            <?= msg.author_name ?> (
-            <?= msg.author_type ?>) at
-            <?= new Date(msg.created_at).toLocaleString() ?>, last updated
-            <?= new Date(msg.updated_at).toLocaleString() ?>
-          </small>
+                    <small class="text-muted">
+                        By
+                        <?= msg.author_name ?> (
+                        <?= msg.author_type ?>) at
+                        <?= new Date(msg.created_at).toLocaleString() ?>, last updated
+                        <?= new Date(msg.updated_at).toLocaleString() ?>
+                    </small>
 
-          <? if (msg.author_type === user.user_type) { ?>
-            <? if (user.user_type === 'customer' && index >= 0) { ?>
-                <? 
+                    <? if (msg.author_type === user.user_type) { ?>
+                    <? if (user.user_type === 'customer' && index >= 0) { ?>
+                    <? 
                     const msgAgeMinutes = (new Date() - new Date(msg?.updated_at || msg?.created_at)) / (1000 * 60); 
                 ?>
-            <? if (msgAgeMinutes <= 30) { ?>
-            <button class="btn btn-sm edit-msg" value="<?= msg.id ?>" title="Edit Post">
-                <i class="bi bi-pencil-square"></i>
-            </button>
-            <button class="btn btn-sm delete-msg" value="<?= msg.id ?>" title="Delete Post">
-                <i class="bi bi-trash3 text-red"></i>
-            </button>
-            <? } ?>
-            <? } else if (user.user_type === 'staff') { ?>
-            <button class="btn btn-sm edit-msg" value="<?= msg.id ?>" title="Edit Post">
-                <i class="bi bi-pencil-square"></i>
-            </button>
-            <button class="btn btn-sm delete-msg" value="<?= msg.id ?>" title="Delete Post">
-                <i class="bi bi-trash3 text-red"></i>
-            </button>
-            <? } ?>
-          <? } ?>
-        </div>
+                    <? if (msgAgeMinutes <= 30) { ?>
+                    <button class="btn btn-sm edit-msg" value="<?= msg.id ?>" title="Edit Post">
+                        <i class="bi bi-pencil-square"></i>
+                    </button>
+                    <button class="btn btn-sm delete-msg" value="<?= msg.id ?>" title="Delete Post">
+                        <i class="bi bi-trash3 text-red"></i>
+                    </button>
+                    <? } ?>
+                    <? } else if (user.user_type === 'staff') { ?>
+                    <button class="btn btn-sm edit-msg" value="<?= msg.id ?>" title="Edit Post">
+                        <i class="bi bi-pencil-square"></i>
+                    </button>
+                    <button class="btn btn-sm delete-msg" value="<?= msg.id ?>" title="Delete Post">
+                        <i class="bi bi-trash3 text-red"></i>
+                    </button>
+                    <? } ?>
+                    <? } ?>
+                </div>
 
-        <!-- Attachments -->
-        <div class="d-flex justify-content-end align-items-center gap-2">
-          <? if (msg.attachments && msg.attachments.length > 0) { ?>
-          <? msg.attachments.forEach(file => { ?>
-          <? if (file.file_type === 'pdf') { ?>
-          <a href="/auth/ticket/attachments/<?= ticket.id ?>/<?= file.file_name ?>" target="_blank" class="mb-2">
-            <i class="bi bi-file-earmark-pdf"></i>
-            <?= file.original_name || file.file_name ?>
-          </a>
-          <? } else { ?>
-          <a href="/auth/ticket/attachments/<?= ticket.id ?>/<?= file.file_name ?>" target="_blank" class="mb-2">
-            <img src="/auth/ticket/attachments/<?= ticket.id ?>/<?= file.file_name ?>"
-              alt="<?= file.original_name || file.file_name ?>" class="img-thumbnail" style="max-width: 100px;">
-          </a>
-          <? } ?>
-          <? }); ?>
-          <? } else { ?>
-          <small class="text-muted">No attachments</small>
-          <? } ?>
+                <!-- Attachments -->
+                <div class="d-flex justify-content-end align-items-center gap-2">
+                    <? if (msg.attachments && msg.attachments.length > 0) { ?>
+                    <? msg.attachments.forEach(file => { ?>
+                    <? if (file.file_type === 'pdf') { ?>
+                    <a href="/auth/ticket/attachments/<?= ticket.id ?>/<?= file.file_name ?>" target="_blank"
+                        class="mb-2">
+                        <i class="bi bi-file-earmark-pdf"></i>
+                        <?= file.original_name || file.file_name ?>
+                    </a>
+                    <? } else { ?>
+                    <a href="/auth/ticket/attachments/<?= ticket.id ?>/<?= file.file_name ?>" target="_blank"
+                        class="mb-2">
+                        <img src="/auth/ticket/attachments/<?= ticket.id ?>/<?= file.file_name ?>"
+                            alt="<?= file.original_name || file.file_name ?>" class="img-thumbnail"
+                            style="max-width: 100px;">
+                    </a>
+                    <? } ?>
+                    <? }); ?>
+                    <? } else { ?>
+                    <small class="text-muted">No attachments</small>
+                    <? } ?>
+                </div>
+            </div>
         </div>
-      </div>
+        <? }); ?>
+        <? } else { ?>
+        <p>No follow-ups yet.</p>
+        <? } ?>
     </div>
-    <? }); ?>
-    <? } else { ?>
-    <p>No follow-ups yet.</p>
-    <? } ?>
-  </div>
 
 
-  <!-- Add Follow-up Form -->
-  <div class="card my-5">
-    <div class="card-header">Add Follow-up</div>
-    <div class="card-body">
-      <form action="/auth/ticket/<?= ticket.id ?>/reply" method="POST" enctype="multipart/form-data">
-        <div class="mb-3">
-          <label for="message_text" class="form-label">Message</label>
-          <textarea name="message_text" id="message_text" rows="4" class="form-control" required></textarea>
+    <!-- Add Follow-up Form -->
+    <div class="card my-5">
+        <div class="card-header">Add Follow-up</div>
+        <div class="card-body">
+            <form action="/auth/ticket/<?= ticket.id ?>/reply" method="POST" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="message_text" class="form-label">Message</label>
+                    <textarea name="message_text" id="message_text" rows="4" class="form-control" required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="attachments" class="form-label">Attachments (images or PDFs)</label>
+                    <input type="file" name="attachments" id="attachments" class="form-control" multiple
+                        accept="image/*,application/pdf">
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Follow-up</button>
+            </form>
+
         </div>
-        <div class="mb-3">
-          <label for="attachments" class="form-label">Attachments (images or PDFs)</label>
-          <input type="file" name="attachments" id="attachments" class="form-control" multiple
-            accept="image/*,application/pdf">
-        </div>
-        <button type="submit" class="btn btn-primary">Submit Follow-up</button>
-      </form>
-
     </div>
-  </div>
 
-  <p class="my-5 small text-center text-notice"><strong>Note: </strong>You may edit or delete a message or post within 30 minutes of sending it.</p>
+    <p class="my-5 small text-center text-notice"><strong>Note: </strong>You may edit or delete a message or post within
+        30 minutes of sending it.</p>
 </div>
+
+
 
 
 <script type="module" src="/js/followups.js"></script>

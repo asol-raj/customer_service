@@ -3,6 +3,17 @@ import { jq, log } from './help.js';
 document.addEventListener('DOMContentLoaded', () => {
     const wrap = document.getElementById('messagesWrap'); // container that wraps all messages
     const ticketId = document.getElementById('ticketId').value; //console.log(ticketId);
+    const socket = io();
+    socket.emit('joinTicket', ticketId);
+
+    // Receive new follow-ups (posted by anyone)
+    // socket.on('receiveFollowUp', (row) => {
+    //     // Simple append (avoid duplicates by checking data-id if you want)
+    //     const li = document.createElement('li');
+    //     li.setAttribute('data-id', row.id);
+    //     li.innerHTML = `<span>${row.message}</span> <small>${new Date(row.created_at).toLocaleString()}</small>`;
+    //     document.getElementById('followUpList').appendChild(li);
+    // });
 
     wrap.addEventListener('click', async (e) => {
         const editBtn = e.target.closest('.edit-msg');

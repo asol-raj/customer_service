@@ -10,6 +10,8 @@ const cookieParser = require('cookie-parser');
 const ejs = require('ejs');
 const log = console.log;
 ejs.delimiter = '?';
+const http = require('http');
+const { Server } = require('socket.io');
 
 
 app.use(cors());
@@ -25,8 +27,8 @@ app.use(express.static(path.join(__dirname, 'src', 'public')));
 app.use((req, res, next) => {
     res.locals.hideNavbar = false; // default: show navbar
     res.locals.error = null;
-    res.locals.message= null;
-    res.locals.user=null;
+    res.locals.message = null;
+    res.locals.user = null;
     // Auto-hide for these routes
     const hideNavbarRoutes = ["/", "/login", "/register", "/reset-password"];
     if (hideNavbarRoutes.includes(req.path)) {
@@ -37,21 +39,70 @@ app.use((req, res, next) => {
 
 // app.get('/', (req, res)=> res.render('index'));
 // app.get('/test', (req, res) => res.type('text').send('TEST from app.js'));
-app.use('/', require('./src/routes/_router'));
+// app.use('/', require('./src/routes/_router'));
+try {
+    const routes = require('./src/router/routes');
+    app.use('/', routes);
+} catch (e) {
+    // Fallback route (so the app still boots if routes aren't wired yet)
+    app.get('/', (_req, res) => {
+        res.send('App is running. (Routes module not found or not configured)');
+    });
+}
 
-// CATCH-ALL ROUTE (MUST be AFTER all other specific routes)
-app.use((req, res, next) => {
-    res.status(404).render('error', { title: 'Page Not Found', layout: false });
+const server = http.createServer(app);
+const io = new Server(server);
+// Make io available to controllers: req.app.get('io')
+app.set('io', io);
+
+const ticketRoom = (id) => `ticket_${id}`;
+
+io.on('connection', (socket) => {
+    // Client will ask to join a ticket room when they open the follow-up page
+    socket.on('joinTicket', (ticketId) => {
+        if (!Number.isInteger(ticketId) || ticketId <= 0) return;
+        socket.join(ticketRoom(ticketId));
+    });
+
+    socket.on('leaveTicket', (ticketId) => {
+        if (!Number.isInteger(ticketId) || ticketId <= 0) return;
+        socket.leave(ticketRoom(ticketId));
+    });
 });
 
-// Optional: General error handler for server errors (e.g., 500)
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).send('<h1>500 - Server Error</h1><p>Something went wrong on our end!</p>');
+// ----- 404 handler -----
+app.use((req, res, _next) => {
+    res.status(404);
+    // Render a 404.ejs if you have one; otherwise send text
+    try {
+        return res.render('404', { url: req.originalUrl });
+    } catch {
+        return res.send(`Not Found: ${req.originalUrl}`);
+    }
+});
+
+
+// ----- Error handler -----
+app.use((err, _req, res, _next) => {
+    console.error(err);
+    const status = err.status || 500;
+    // Render an error.ejs if present; otherwise send JSON
+    try {
+        return res.status(status).render('error', {
+            status,
+            message: err.message || 'Internal Server Error',
+            stack: process.env.NODE_ENV === 'production' ? null : err.stack,
+        });
+    } catch {
+        return res.status(status).json({
+            status,
+            message: err.message || 'Internal Server Error',
+        });
+    }
 });
 
 // Start server
-app.listen(port, '0.0.0.0', () => {
+server.listen(port, '0.0.0.0', () => {
     const networkInterfaces = os.networkInterfaces();
     let hostAddress;
 
